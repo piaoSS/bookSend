@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import com.thinkgem.jeesite.modules.school.entity.SelfSchool;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 
@@ -31,6 +32,7 @@ public class User extends DataEntity<User> {
 	private static final long serialVersionUID = 1L;
 	private Office company;	// 归属公司
 	private Office office;	// 归属部门
+	private SelfSchool school; //归属学校
 	private String loginName;// 登录名
 	private String password;// 密码
 	private String no;		// 工号
@@ -105,7 +107,12 @@ public class User extends DataEntity<User> {
 	public void setCompany(Office company) {
 		this.company = company;
 	}
-	
+
+	public SelfSchool getSchool(){return school;}
+	public void setSchool(SelfSchool school) {
+		this.school = school;
+	}
+
 	@JsonIgnore
 	@NotNull(message="归属部门不能为空")
 	@ExcelField(title="归属部门", align=2, sort=25)
