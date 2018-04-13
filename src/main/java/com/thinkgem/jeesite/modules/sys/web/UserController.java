@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 
+import com.thinkgem.jeesite.modules.school.entity.SelfSchool;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -66,12 +67,25 @@ public class UserController extends BaseController {
 	}
 
 	@RequiresPermissions("sys:user:view")
+    @RequestMapping(value = {"indexTree"})
+    public String indexTree(User user, Model model) {
+        return "modules/sys/userManagerIndex";
+    }
+
+    @RequiresPermissions("sys:user:view")
 	@RequestMapping(value = {"list", ""})
 	public String list(User user, HttpServletRequest request, HttpServletResponse response, Model model) {
 		Page<User> page = systemService.findUser(new Page<User>(request, response), user);
         model.addAttribute("page", page);
 		return "modules/sys/userList";
 	}
+
+	@RequestMapping(value = {"listTree", ""})
+    public String listTree(User user, HttpServletRequest request, HttpServletResponse response, Model model) {
+        Page<User> page = systemService.findTreeUser(new Page<User>(request, response), user);
+        model.addAttribute("page", page);
+        return "modules/sys/userList";
+    }
 	
 	@ResponseBody
 	@RequiresPermissions("sys:user:view")
@@ -90,6 +104,12 @@ public class UserController extends BaseController {
 		if (user.getOffice()==null || user.getOffice().getId()==null){
 			user.setOffice(UserUtils.getUser().getOffice());
 		}
+		if (user.getSchool()==null || user.getSchool().getId()==null){
+			user.setSchool(UserUtils.getUser().getSchool());
+		}
+		if (user.getHouse()==null || user.getHouse().getId()==null){
+			user.setHouse(UserUtils.getUser().getHouse());
+		}
 		model.addAttribute("user", user);
 		model.addAttribute("allRoles", systemService.findAllRole());
 		return "modules/sys/userForm";
@@ -102,9 +122,7 @@ public class UserController extends BaseController {
 			addMessage(redirectAttributes, "演示模式，不允许操作！");
 			return "redirect:" + adminPath + "/sys/user/list?repage";
 		}
-		// 修正引用赋值问题，不知道为何，Company和Office引用的一个实例地址，修改了一个，另外一个跟着修改。
-		user.setCompany(new Office(request.getParameter("company.id")));
-		user.setOffice(new Office(request.getParameter("office.id")));
+
 		// 如果新密码为空，则不更换密码
 		if (StringUtils.isNotBlank(user.getNewPassword())) {
 			user.setPassword(SystemService.entryptPassword(user.getNewPassword()));
@@ -240,7 +258,8 @@ public class UserController extends BaseController {
             String fileName = "用户数据导入模板.xlsx";
     		List<User> list = Lists.newArrayList(); list.add(UserUtils.getUser());
     		new ExportExcel("用户数据", User.class, 2).setDataList(list).write(response, fileName).dispose();
-    		return null;
+
+			return null;
 		} catch (Exception e) {
 			addMessage(redirectAttributes, "导入模板下载失败！失败信息："+e.getMessage());
 		}

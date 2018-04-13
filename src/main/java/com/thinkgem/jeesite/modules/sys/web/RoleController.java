@@ -6,6 +6,7 @@ package com.thinkgem.jeesite.modules.sys.web;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -68,7 +69,7 @@ public class RoleController extends BaseController {
 	@RequestMapping(value = "form")
 	public String form(Role role, Model model) {
 		if (role.getOffice()==null){
-			role.setOffice(UserUtils.getUser().getOffice());
+			role.setOffice(UserUtils.getUser().getSchool());
 		}
 		model.addAttribute("role", role);
 		model.addAttribute("menuList", systemService.findAllMenu());
@@ -133,7 +134,7 @@ public class RoleController extends BaseController {
 	 */
 	@RequiresPermissions("sys:role:edit")
 	@RequestMapping(value = "assign")
-	public String assign(Role role, Model model) {
+	public String assign(Role role, HttpServletRequest request, HttpServletResponse response, Model model) {
 		List<User> userList = systemService.findUser(new User(new Role(role.getId())));
 		model.addAttribute("userList", userList);
 		return "modules/sys/roleAssign";

@@ -4,6 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<!-- 這是前台界面的頭部頁面-->
 	<title><sitemesh:title default="欢迎光临"/> - ${site.title} - Powered By JeeSite</title>
 	<%@include file="/WEB-INF/views/modules/cms/front/include/head.jsp" %>
 	<!-- Baidu tongji analytics --><script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="//hm.baidu.com/hm.js?82116c626a8d504a5c0675073362ef6f";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();</script>
@@ -15,13 +16,15 @@
         <div class="container">
           <c:choose>
    			<c:when test="${not empty site.logo}">
-   				<img alt="${site.title}" src="${site.logo}" class="container" onclick="location='${ctx}/index-${site.id}${fns:getUrlSuffix()}'">
+				志诚图书馆
+   				<%--<img alt="${site.title}" src="${site.logo}" class="container" onclick="location='${ctx}/index-${site.id}${fns:getUrlSuffix()}'">--%>
    			</c:when>
    			<c:otherwise><a class="brand" href="${ctx}/index-${site.id}${fns:getUrlSuffix()}">${site.title}</a></c:otherwise>
    		  </c:choose>
           <div class="nav-collapse">
             <ul id="main_nav" class="nav nav-pills">
-             	<li class="${not empty isIndex && isIndex ? 'active' : ''}"><a href="${ctx}/index-1${fns:getUrlSuffix()}"><span>${site.id eq '1'?'首　 页':'返回主站'}</span></a></li>
+             	<li class="${not empty isIndex && isIndex ? 'active' : ''}">
+					<a href="${ctx}/index-1${fns:getUrlSuffix()}"><span>${site.id eq '1'?'首　 页':'返回主站'}</span></a></li>
 				<c:forEach items="${fnc:getMainNavList(site.id)}" var="category" varStatus="status"><c:if test="${status.index lt 6}">
                     <c:set var="menuCategoryId" value=",${category.id},"/>
 		    		<li class="${requestScope.category.id eq category.id||fn:indexOf(requestScope.category.parentIds,menuCategoryId) ge 1?'active':''}"><a href="${category.url}" target="${category.target}"><span>${category.name}</span></a></li>
@@ -39,6 +42,16 @@
 				    </ul>
 				    <!--[if lte IE 6]><script type="text/javascript">$('#themeSwitch').hide();</script><![endif]-->
 			    </li>
+				<li id="userInfo" class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#" title="个人信息">您好, ${fns:getUser().name}&nbsp;<span id="notifyNum" class="label label-info hide"></span></a>
+					<ul class="dropdown-menu">
+						<li><a href="${ctx}/sys/user/info" target="mainFrame"><i class="icon-user"></i>&nbsp; 个人信息</a></li>
+						<li><a href="${ctx}/sys/user/modifyPwd" target="mainFrame"><i class="icon-lock"></i>&nbsp;  修改密码</a></li>
+						<li><a href="${ctx}/oa/oaNotify/self" target="mainFrame"><i class="icon-bell"></i>&nbsp;  我的通知 <span id="notifyNum2" class="label label-info hide"></span></a></li>
+					</ul>
+				</li>
+				<li><a href="${ctxStaticFront}/siteForm" title="退出登录">退出</a></li>
+				<li>&nbsp;</li>
             </ul>
             <form class="navbar-form pull-right" action="${ctx}/search" method="get">
               	<input type="text" name="q" maxlength="20" style="width:65px;" placeholder="全站搜索..." value="${q}">

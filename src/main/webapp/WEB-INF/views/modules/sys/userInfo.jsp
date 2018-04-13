@@ -4,8 +4,13 @@
 <head>
 	<title>个人信息</title>
 	<meta name="decorator" content="default"/>
+	<link href="${ctxStatic}/bookIndex/styleSpinic.css" type="text/css" rel="stylesheet" />
 	<script type="text/javascript">
 		$(document).ready(function() {
+
+		    $("#name").click(function () {
+				alert(ctx);
+            });
 			$("#inputForm").validate({
 				submitHandler: function(form){
 					loading('正在提交，请稍等...');
@@ -29,6 +34,7 @@
 		<li class="active"><a href="${ctx}/sys/user/info">个人信息</a></li>
 		<li><a href="${ctx}/sys/user/modifyPwd">修改密码</a></li>
 	</ul><br/>
+
 	<form:form id="inputForm" modelAttribute="user" action="${ctx}/sys/user/info" method="post" class="form-horizontal"><%--
 		<form:hidden path="email" htmlEscape="false" maxlength="255" class="input-xlarge"/>
 		<sys:ckfinder input="email" type="files" uploadPath="/mytask" selectMultiple="false"/> --%>
@@ -41,17 +47,32 @@
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label">归属公司:</label>
+			<label class="control-label">归属机构：</label>
 			<div class="controls">
-				<label class="lbl">${user.company.name}</label>
+				<sys:treeselect id="school" name="school.id" value="${user.school.id}"
+								labelName="school.name" labelValue="${user.school.name}" title="机构"
+								url="/school/selfSchool/treeData" cssClass="" allowClear="true"/>
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label">归属部门:</label>
+			<label class="control-label">归属公寓：</label>
 			<div class="controls">
-				<label class="lbl">${user.office.name}</label>
+				<sys:treeselect id="selfHouse" name="selfHouse.id" value="${userManager.selfHouse.id}" labelName="office.selfHouse" labelValue="${userManager.selfHouse.name}"
+								title="公寓" url="/house/selfHouse/treeData" cssClass="" allowClear="true"/>
 			</div>
 		</div>
+		<%--<div class="control-group">--%>
+			<%--<label class="control-label">归属公司:</label>--%>
+			<%--<div class="controls">--%>
+				<%--<label class="lbl">${user.company.name}</label>--%>
+			<%--</div>--%>
+		<%--</div>--%>
+		<%--<div class="control-group">--%>
+			<%--<label class="control-label">归属部门:</label>--%>
+			<%--<div class="controls">--%>
+				<%--<label class="lbl">${user.office.name}</label>--%>
+			<%--</div>--%>
+		<%--</div>--%>
 		<div class="control-group">
 			<label class="control-label">姓名:</label>
 			<div class="controls">

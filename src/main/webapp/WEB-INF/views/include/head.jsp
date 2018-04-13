@@ -19,3 +19,9 @@
 <link href="${ctxStatic}/common/jeesite.css" type="text/css" rel="stylesheet" />
 <script src="${ctxStatic}/common/jeesite.js" type="text/javascript"></script>
 <script type="text/javascript">var ctx = '${ctx}', ctxStatic='${ctxStatic}';</script>
+<%--<link href="${ctxStatic}/inspinia/style.css" type="text/css" rel="stylesheet" />--%>
+<%--<link href="${ctxStatic}/inspinia/sweetalert.css" type="text/css" rel="stylesheet" />--%>
+<%--<link href="${ctxStatic}/inspinia/animate.css" type="text/css" rel="stylesheet" />--%>
+<%--<script src="${ctxStatic}/inspinia/jquery-ui.custom.min.js" type="text/javascript"></script>--%>
+<%--<script src="${ctxStatic}/inspinia/jquery-ui-1.10.4.min.js" type="text/javascript"></script>--%>
+<%--<script src="${ctxStatic}/inspinia/inspinia.js" type="text/javascript"></script>--%>

@@ -5,6 +5,10 @@ package com.thinkgem.jeesite.modules.sys.utils;
 
 import java.util.List;
 
+import com.thinkgem.jeesite.modules.house.dao.SelfHouseDao;
+import com.thinkgem.jeesite.modules.library.dao.SelfLibraryDao;
+import com.thinkgem.jeesite.modules.school.dao.SelfSchoolDao;
+import com.thinkgem.jeesite.modules.school.entity.SelfSchool;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.session.InvalidSessionException;
@@ -38,6 +42,9 @@ public class UserUtils {
 	private static MenuDao menuDao = SpringContextHolder.getBean(MenuDao.class);
 	private static AreaDao areaDao = SpringContextHolder.getBean(AreaDao.class);
 	private static OfficeDao officeDao = SpringContextHolder.getBean(OfficeDao.class);
+	private static SelfSchoolDao selfSchoolDao = SpringContextHolder.getBean(SelfSchoolDao.class);
+	private static SelfHouseDao selfHouseDao = SpringContextHolder.getBean(SelfHouseDao.class);
+	private static SelfLibraryDao selfLibraryDao = SpringContextHolder.getBean(SelfLibraryDao.class);
 
 	public static final String USER_CACHE = "userCache";
 	public static final String USER_CACHE_ID_ = "id_";
@@ -48,6 +55,9 @@ public class UserUtils {
 	public static final String CACHE_ROLE_LIST = "roleList";
 	public static final String CACHE_MENU_LIST = "menuList";
 	public static final String CACHE_AREA_LIST = "areaList";
+	public static final String CACHE_SCHOOL_LIST = "schoolList";
+	public static final String CACHE_HOUSE_LIST = "houseList";
+	public static final String CACHE_LIBRARY_LIST = "libraryList";
 	public static final String CACHE_OFFICE_LIST = "officeList";
 	public static final String CACHE_OFFICE_ALL_LIST = "officeAllList";
 	
@@ -99,6 +109,9 @@ public class UserUtils {
 		removeCache(CACHE_AREA_LIST);
 		removeCache(CACHE_OFFICE_LIST);
 		removeCache(CACHE_OFFICE_ALL_LIST);
+		removeCache(CACHE_SCHOOL_LIST);
+		removeCache(CACHE_HOUSE_LIST);
+		removeCache(CACHE_LIBRARY_LIST);
 		UserUtils.clearCache(getUser());
 	}
 	
@@ -173,7 +186,8 @@ public class UserUtils {
 		}
 		return menuList;
 	}
-	
+
+
 	/**
 	 * 获取当前用户授权的区域
 	 * @return
@@ -187,6 +201,41 @@ public class UserUtils {
 		}
 		return areaList;
 	}
+
+	/**
+	 * 获取当前用户有权限访问的所有的机构
+	 * @return
+	 */
+	public static List<SelfSchool> getSelfSchoolAllList(){
+		@SuppressWarnings("unchecked")
+		List<SelfSchool> schoolList = (List<SelfSchool>)getCache(CACHE_SCHOOL_LIST);
+		if (schoolList == null){
+			schoolList = selfSchoolDao.findAllList(new SelfSchool());
+			putCache(CACHE_SCHOOL_LIST, schoolList);
+		}
+		return schoolList;
+	}
+	/**
+	 * 获取当前用户有权限访问的机构
+	 * @return
+	 */
+	public static List<SelfSchool> getSelfSchoolList(){
+		@SuppressWarnings("unchecked")
+		List<SelfSchool> schoolList = (List<SelfSchool>)getCache(CACHE_SCHOOL_LIST);
+		if (schoolList == null){
+			User user = getUser();
+			if (user.isAdmin()){
+				schoolList = selfSchoolDao.findAllList(new SelfSchool());
+			}else{
+				SelfSchool school = new SelfSchool();
+				school.getSqlMap().put("dsf", BaseService.dataScopeFilter(user, "a", ""));
+				schoolList = selfSchoolDao.findList(school);
+			}
+			putCache(CACHE_SCHOOL_LIST, schoolList);
+		}
+		return schoolList;
+	}
+
 	
 	/**
 	 * 获取当前用户有权限访问的部门
@@ -208,6 +257,7 @@ public class UserUtils {
 		}
 		return officeList;
 	}
+
 
 	/**
 	 * 获取当前用户有权限访问的部门

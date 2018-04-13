@@ -5,6 +5,7 @@ package com.thinkgem.jeesite.modules.school.service;
 
 import java.util.List;
 
+import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,9 @@ public class SelfSchoolService extends TreeService<SelfSchoolDao, SelfSchool> {
 	}
 
 	public List<SelfSchool> findList(SelfSchool selfSchool) {
+
+//		return UserUtils.getSelfSchoolList();
+
 		if (StringUtils.isNotBlank(selfSchool.getParentIds())){
 			selfSchool.setParentIds(","+selfSchool.getParentIds()+",");
 		}

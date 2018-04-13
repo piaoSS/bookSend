@@ -5,6 +5,7 @@ package com.thinkgem.jeesite.modules.sys.entity;
 
 import java.util.List;
 
+import com.thinkgem.jeesite.modules.school.entity.SelfSchool;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Length;
 
@@ -20,7 +21,7 @@ import com.thinkgem.jeesite.common.persistence.DataEntity;
 public class Role extends DataEntity<Role> {
 	
 	private static final long serialVersionUID = 1L;
-	private Office office;	// 归属机构
+	private SelfSchool office;	//归属机构
 	private String name; 	// 角色名称
 	private String enname;	// 英文名称
 	private String roleType;// 权限类型
@@ -33,11 +34,16 @@ public class Role extends DataEntity<Role> {
 	
 	private User user;		// 根据用户ID查询角色列表
 
-//	private List<User> userList = Lists.newArrayList(); // 拥有用户列表
+	private List<User> userList = Lists.newArrayList(); // 拥有用户列表
 	private List<Menu> menuList = Lists.newArrayList(); // 拥有菜单列表
-	private List<Office> officeList = Lists.newArrayList(); // 按明细设置数据范围
+	private List<SelfSchool> officeList = Lists.newArrayList(); // 按明细设置数据范围
 
-	// 数据范围（1：所有数据；2：所在公司及以下数据；3：所在公司数据；4：所在部门及以下数据；5：所在部门数据；8：仅本人数据；9：按明细设置）
+
+	// 数据范围（1：所有数据；2：所在公司及以下数据；3：所在公司数据；4：所在部门及以下数据；
+	// 5：所在部门数据；8：仅本人数据；9：按明细设置）
+
+	// 数据范围（1：所有数据；2：所在学校及以下数据；3：所在学校数据；4：所在院及以下数据；
+	// 5：所在院数据；8：仅本人数据；9：按明细设置）
 	public static final String DATA_SCOPE_ALL = "1";
 	public static final String DATA_SCOPE_COMPANY_AND_CHILD = "2";
 	public static final String DATA_SCOPE_COMPANY = "3";
@@ -77,13 +83,15 @@ public class Role extends DataEntity<Role> {
 		this.sysData = sysData;
 	}
 
-	public Office getOffice() {
+
+	public SelfSchool getOffice() {
 		return office;
 	}
 
-	public void setOffice(Office office) {
+	public void setOffice(SelfSchool office) {
 		this.office = office;
 	}
+
 
 	@Length(min=1, max=100)
 	public String getName() {
@@ -136,25 +144,25 @@ public class Role extends DataEntity<Role> {
 		this.oldEnname = oldEnname;
 	}
 
-//	public List<User> getUserList() {
-//		return userList;
-//	}
-//
-//	public void setUserList(List<User> userList) {
-//		this.userList = userList;
-//	}
-//	
-//	public List<String> getUserIdList() {
-//		List<String> nameIdList = Lists.newArrayList();
-//		for (User user : userList) {
-//			nameIdList.add(user.getId());
-//		}
-//		return nameIdList;
-//	}
-//
-//	public String getUserIds() {
-//		return StringUtils.join(getUserIdList(), ",");
-//	}
+	public List<User> getUserList() {
+		return userList;
+	}
+
+	public void setUserList(List<User> userList) {
+		this.userList = userList;
+	}
+
+	public List<String> getUserIdList() {
+		List<String> nameIdList = Lists.newArrayList();
+		for (User user : userList) {
+			nameIdList.add(user.getId());
+		}
+		return nameIdList;
+	}
+
+	public String getUserIds() {
+		return StringUtils.join(getUserIdList(), ",");
+	}
 
 	public List<Menu> getMenuList() {
 		return menuList;
@@ -192,18 +200,18 @@ public class Role extends DataEntity<Role> {
 			setMenuIdList(Lists.newArrayList(ids));
 		}
 	}
-	
-	public List<Office> getOfficeList() {
+
+	public List<SelfSchool> getOfficeList() {
 		return officeList;
 	}
 
-	public void setOfficeList(List<Office> officeList) {
+	public void setOfficeList(List<SelfSchool> officeList) {
 		this.officeList = officeList;
 	}
 
 	public List<String> getOfficeIdList() {
 		List<String> officeIdList = Lists.newArrayList();
-		for (Office office : officeList) {
+		for (SelfSchool office : officeList) {
 			officeIdList.add(office.getId());
 		}
 		return officeIdList;
@@ -212,7 +220,7 @@ public class Role extends DataEntity<Role> {
 	public void setOfficeIdList(List<String> officeIdList) {
 		officeList = Lists.newArrayList();
 		for (String officeId : officeIdList) {
-			Office office = new Office();
+			SelfSchool office = new SelfSchool();
 			office.setId(officeId);
 			officeList.add(office);
 		}
@@ -251,20 +259,4 @@ public class Role extends DataEntity<Role> {
 		this.user = user;
 	}
 
-//	public boolean isAdmin(){
-//		return isAdmin(this.id);
-//	}
-//	
-//	public static boolean isAdmin(String id){
-//		return id != null && "1".equals(id);
-//	}
-	
-//	@Transient
-//	public String getMenuNames() {
-//		List<String> menuNameList = Lists.newArrayList();
-//		for (Menu menu : menuList) {
-//			menuNameList.add(menu.getName());
-//		}
-//		return StringUtils.join(menuNameList, ",");
-//	}
 }

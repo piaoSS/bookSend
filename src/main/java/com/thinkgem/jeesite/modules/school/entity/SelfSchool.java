@@ -9,6 +9,8 @@ import org.hibernate.validator.constraints.Length;
 
 import com.thinkgem.jeesite.common.persistence.TreeEntity;
 
+import java.util.List;
+
 /**
  * 学校机构设置Entity
  * @author wp
@@ -19,10 +21,11 @@ public class SelfSchool extends TreeEntity<SelfSchool> {
 	private static final long serialVersionUID = 1L;
 //	private SelfSchool parent;		// 父级编号
 //	private String parentIds;		// 所有父级编号
-//	private String name;		// 名称
+	private String name;		// 名称
 //	private Integer sort;		// 排序
 	private String type;		// 类型
 	private String grade;		// 机构等级/编码
+	private List<String> childDeptList;//快速添加子部门
 	
 	public SelfSchool() {
 		super();
@@ -33,7 +36,24 @@ public class SelfSchool extends TreeEntity<SelfSchool> {
 		super(id);
 	}
 
-//	@JsonBackReference
+	public List<String> getChildDeptList() {
+		return childDeptList;
+	}
+
+	public void setChildDeptList(List<String> childDeptList) {
+		this.childDeptList = childDeptList;
+	}
+
+	@Length(min=1, max=100)
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	//	@JsonBackReference
 //	@NotNull(message="父级编号不能为空")
 	public SelfSchool getParent() {
 		return parent;

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.bookcomment.dao.BookCommentDao">
+    
+	<sql id="bookCommentColumns">
+		a.id AS "id",
+		a.book_id AS "bookId.id",
+		a.user_id AS "userId.id",
+		a.content AS "content",
+		a.ip AS "ip",
+		a.create_date AS "createDate",
+		a.audit_user_id AS "auditUserId.id",
+		a.audit_date AS "auditDate",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="bookCommentJoins">
+		LEFT JOIN sys_user u3 ON u3.id = a.user_id
+	</sql>
+    
+	<select id="get" resultType="BookComment">
+		SELECT 
+			<include refid="bookCommentColumns"/>
+		FROM book_comment a
+		<include refid="bookCommentJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BookComment">
+		SELECT 
+			<include refid="bookCommentColumns"/>
+		FROM book_comment a
+		<include refid="bookCommentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="bookId != null and bookId.id != null and bookId.id != ''">
+				AND a.book_id = #{bookId.id}
+			</if>
+			<if test="userId != null and userId.id != null and userId.id != ''">
+				AND a.user_id = #{userId.id}
+			</if>
+			<if test="content != null and content != ''">
+				AND a.content LIKE 
+					<if test="dbName == 'oracle'">'%'||#{content}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{content}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{content},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BookComment">
+		SELECT 
+			<include refid="bookCommentColumns"/>
+		FROM book_comment a
+		<include refid="bookCommentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO book_comment(
+			id,
+			book_id,
+			user_id,
+			content,
+			ip,
+			create_date,
+			audit_user_id,
+			audit_date,
+			del_flag
+		) VALUES (
+			#{id},
+			#{bookId.id},
+			#{userId.id},
+			#{content},
+			#{ip},
+			#{createDate},
+			#{auditUserId.id},
+			#{auditDate},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE book_comment SET 	
+			book_id = #{bookId.id},
+			user_id = #{userId.id},
+			content = #{content},
+			ip = #{ip},
+			create_date = #{createDate},
+			audit_user_id = #{auditUserId.id},
+			audit_date = #{auditDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE book_comment SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

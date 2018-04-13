@@ -3,11 +3,14 @@
  */
 package com.thinkgem.jeesite.modules.sys.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import com.thinkgem.jeesite.modules.book.entity.Book;
+import com.thinkgem.jeesite.modules.house.entity.SelfHouse;
 import com.thinkgem.jeesite.modules.school.entity.SelfSchool;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
@@ -32,7 +35,12 @@ public class User extends DataEntity<User> {
 	private static final long serialVersionUID = 1L;
 	private Office company;	// 归属公司
 	private Office office;	// 归属部门
-	private SelfSchool school; //归属学校
+	private SelfSchool school; //归属机构
+	private SelfHouse house;   //归属公寓
+	private Integer creditWorth; //信誉度
+	private String sex; 		//性别
+	private Date birthday;   //生日
+	private String job;		 // 学历 或 职业
 	private String loginName;// 登录名
 	private String password;// 密码
 	private String no;		// 工号
@@ -53,8 +61,13 @@ public class User extends DataEntity<User> {
 	private Date oldLoginDate;	// 上次登陆日期
 	
 	private Role role;	// 根据角色查询用户条件
-	
 	private List<Role> roleList = Lists.newArrayList(); // 拥有角色列表
+
+	private Book book;			//根据用户机构号查询条件
+	private List<Book> bookList = Lists.newArrayList(); // 拥有列表
+	private Integer collect;	// 收藏数
+	private Integer borrow;		// 借阅数
+	private Integer renewal;	// 未还数
 
 	public User() {
 		super();
@@ -70,11 +83,68 @@ public class User extends DataEntity<User> {
 		this.loginName = loginName;
 	}
 
+	public User setUser(User user, Integer collect, Integer renewal, Integer borrow){
+		user.setCollect(collect);
+		user.setRenewal(renewal);
+		user.setBorrow(borrow);
+		return user;
+	}
+
 	public User(Role role){
 		super();
 		this.role = role;
 	}
-	
+
+	public Book getBook() {
+		return book;
+	}
+
+	public void setBook(Book book) {
+		this.book = book;
+	}
+
+	public Integer getCollect() {
+		return collect;
+	}
+
+	public void setCollect(Integer collect) {
+		this.collect = collect;
+	}
+
+	public Integer getBorrow() {
+		return borrow;
+	}
+
+	public void setBorrow(Integer borrow) {
+		this.borrow = borrow;
+	}
+
+	public Integer getRenewal() {
+		return renewal;
+	}
+
+	public void setRenewal(Integer renewal) {
+		this.renewal = renewal;
+	}
+
+	@ExcelField(title="生日", type=0, align=1, sort=100)
+	public Date getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
+	}
+
+	@ExcelField(title="学历/职业", align=2, sort=95)
+	public String getJob() {
+		return job;
+	}
+
+	public void setJob(String job) {
+		this.job = job;
+	}
+	@ExcelField(title="头像", align=2, sort=105,type=2)
 	public String getPhoto() {
 		return photo;
 	}
@@ -91,6 +161,24 @@ public class User extends DataEntity<User> {
 		this.loginFlag = loginFlag;
 	}
 
+	@ExcelField(title="信誉值", align=2, sort=85)
+	public Integer getCreditWorth() {
+		return creditWorth;
+	}
+
+	public void setCreditWorth(Integer creditWorth) {
+		this.creditWorth = creditWorth;
+	}
+
+	@ExcelField(title="性别", align=2, sort=90, dictType="sex")
+	public String getSex() {
+		return sex;
+	}
+
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
+
 	@SupCol(isUnique="true", isHide="true")
 	@ExcelField(title="ID", type=1, align=2, sort=1)
 	public String getId() {
@@ -98,8 +186,8 @@ public class User extends DataEntity<User> {
 	}
 
 	@JsonIgnore
-	@NotNull(message="归属公司不能为空")
-	@ExcelField(title="归属公司", align=2, sort=20)
+//	@NotNull(message="归属公司不能为空")
+//	@ExcelField(title="归属公司", align=2, sort=20)
 	public Office getCompany() {
 		return company;
 	}
@@ -108,14 +196,24 @@ public class User extends DataEntity<User> {
 		this.company = company;
 	}
 
+	@JsonIgnore
+	@ExcelField(value="school.name",title="归属机构",type=1, align=2, sort=20)
 	public SelfSchool getSchool(){return school;}
+
 	public void setSchool(SelfSchool school) {
 		this.school = school;
 	}
 
 	@JsonIgnore
-	@NotNull(message="归属部门不能为空")
-	@ExcelField(title="归属部门", align=2, sort=25)
+//	@ExcelField(title="归属公寓", align=2, sort=20)
+	public SelfHouse getHouse(){return house;}
+
+	public void setHouse(SelfHouse house) {
+		this.house = house;
+	}
+
+	@JsonIgnore
+//	@ExcelField(title="归属部门", align=2, sort=25)
 	public Office getOffice() {
 		return office;
 	}
@@ -279,6 +377,23 @@ public class User extends DataEntity<User> {
 
 	public void setRole(Role role) {
 		this.role = role;
+	}
+
+	@JsonIgnore
+	public List<Book> getBookList() {
+		return bookList;
+	}
+
+	public void setBookList(List<Book> bookList) {
+		this.roleList = roleList;
+	}
+
+	public void setBookList(List<Book> list1,List<Book> list2,List<Book> list3) {
+		list1.addAll(new ArrayList<Book>());
+		list1.addAll(list2);
+		list1.addAll(new ArrayList<Book>());
+		list1.addAll(list3);
+		this.bookList = list1;
 	}
 
 	@JsonIgnore

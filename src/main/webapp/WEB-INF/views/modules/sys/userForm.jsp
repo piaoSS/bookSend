@@ -48,17 +48,42 @@
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label">归属公司:</label>
+			<label class="control-label">归属机构：</label>
 			<div class="controls">
-                <sys:treeselect id="company" name="company.id" value="${user.company.id}" labelName="company.name" labelValue="${user.company.name}"
-					title="公司" url="/sys/office/treeData?type=1" cssClass="required"/>
+				<sys:treeselect id="school" name="school.id" value="${user.school.id}"
+								labelName="school.name" labelValue="${user.school.name}" title="机构"
+								url="/school/selfSchool/treeData" cssClass="" allowClear="true"/>
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label">归属部门:</label>
+			<label class="control-label">归属公寓：</label>
 			<div class="controls">
-                <sys:treeselect id="office" name="office.id" value="${user.office.id}" labelName="office.name" labelValue="${user.office.name}"
-					title="部门" url="/sys/office/treeData?type=2" cssClass="required" notAllowSelectParent="true"/>
+				<sys:treeselect id="selfHouse" name="selfHouse.id" value="${userManager.selfHouse.id}" labelName="office.selfHouse" labelValue="${userManager.selfHouse.name}"
+								title="公寓" url="/house/selfHouse/treeData" cssClass="" allowClear="true"/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">性别：</label>
+			<div class="controls">
+				<form:select path="sex" class="input-medium required">
+					<form:option value="" label=""/>
+					<form:options items="${fns:getDictList('sex')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">生日：</label>
+			<div class="controls">
+
+				<input name="birthday" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate "
+					   value="<fmt:formatDate value="${userManager.birthday}" pattern="yyyy-MM-dd"/>"
+					   onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">学历/职业：</label>
+			<div class="controls">
+				<form:input path="job" htmlEscape="false" maxlength="100" class="input-medium "/>
 			</div>
 		</div>
 		<div class="control-group">

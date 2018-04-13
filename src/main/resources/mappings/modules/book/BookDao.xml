@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.book.dao.BookDao">
+
+	<!--<resultMap id="bookResult" type="Book">-->
+		<!--<id property="id" column="id" />-->
+		<!--<result property="photo" column="photo" />-->
+		<!--<result property="name" column="name" />-->
+		<!--<result property="pressName" column="pressName" />-->
+		<!--<result property="dataScope" column="dataScope" />-->
+		<!--<result property="remarks" column="remarks" />-->
+		<!--<result property="useable" column="useable" />-->
+		<!--<result property="sysData" column="sysData" />-->
+		<!--<association property="office" javaType="SelfSchool">-->
+			<!--<id property="id" column="office.id"/>-->
+			<!--<id property="name" column="office.name"/>-->
+		<!--</association>-->
+		<!--<collection property="menuList" ofType="Menu">-->
+			<!--<id property="id" column="menuList.id" />-->
+		<!--</collection>-->
+		<!--<collection property="officeList" ofType="SelfSchool">-->
+			<!--<id property="id" column="officeList.id" />-->
+		<!--</collection>-->
+	<!--</resultMap>-->
+
+	<sql id="bookColumns">
+		a.id AS "id",
+		a.library_id AS "library.id",
+		a.photo AS "photo",
+		a.name AS "name",
+		a.press_name AS "pressName",
+		a.press_time AS "pressTime",
+		a.total AS "total",
+		a.num AS "num",
+		a.category AS "category",
+		a.author AS "author",
+		a.price AS "price",
+		a.storage_date AS "storageDate",
+		a.collect AS "collect",
+		a.borrow AS "borrow",
+		a.renewal AS "renewal",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="bookJoins">
+		LEFT JOIN self_library c ON c.id = a.library_id
+	</sql>
+
+	<select id="findUserBorrowBookList"  resultType="Book">
+		select
+		<include refid="bookColumns"/>
+		from book a
+		JOIN book_borrow c on c.user_id = #{userId}
+		and
+		<![CDATA[ DATE_SUB(CURDATE(), INTERVAL 30 DAY) <= date(c.create_date) ]]>
+		and c.book_id = a.id
+		and c.del_flag = '0'
+		and a.del_flag = '0'
+	</select>
+
+	<select id="findUserCollectBookList" resultType="Book">
+		select
+		<include refid="bookColumns"/>
+		from book a
+		JOIN book_collect d  on d.user_id = #{userId}
+		-- and
+		-- <![CDATA[ DATE_SUB(CURDATE(), INTERVAL 30 DAY) <= date(d.create_date) ]]>
+		-- and DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= date(d.create_date)
+		and d.book_id = a.id
+		and d.del_flag = '0'
+		and a.del_flag = '0'
+	</select>
+
+	<select id="findUserRenewdBookList" resultType="Book">
+		select
+		<include refid="bookColumns"/>
+		from book a
+		JOIN book_borrow c on c.user_id = #{userId} and c.num &gt; 0
+		and
+		<![CDATA[ DATE_SUB(CURDATE(), INTERVAL 30 DAY) <= date(c.create_date)]]>
+-- 		DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= date(c.create_date)
+		and c.book_id = a.id and c.del_flag = '0'
+		and a.del_flag = '0'
+		order by c.num desc,a.borrow desc
+	</select>
+
+	<select id="findUserNotBackBookList" resultType="Book">
+		select
+		<include refid="bookColumns"/>
+		from book a
+		JOIN book_borrow c on c.user_id = #{userId} and c.status = 2
+		and c.book_id = a.id and c.del_flag = '0'
+		and a.del_flag = '0'
+		order by a.borrow desc,a.collect desc
+	</select>
+
+	<select id="findSchoolBookList" resultType="Book">
+		select
+		<include refid="bookColumns"/>
+		 from book a
+		JOIN book_school  bs on bs.school_id = #{schoolId}
+		and bs.book_category  = a.category
+		and a.del_flag = '0'
+		and a.borrow != 0 or a.collect != 0 or a.renewal != 0
+		order by a.borrow desc, a.renewal desc, a.collect desc
+		limit  10
+	</select>
+
+	<select id="findAllBookList" resultType="Book">
+		select
+		<include refid="bookColumns"/>
+		from book a
+		where a.borrow > 0 or  a.collect > 0 or a.renewal > 0
+		order by a.borrow desc, a.collect desc, a.renewal desc
+	</select>
+
+	<select id="get" resultType="Book">
+		SELECT 
+			<include refid="bookColumns"/>
+		FROM book a
+		<include refid="bookJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Book">
+		SELECT 
+			<include refid="bookColumns"/>,
+			c.name As "library.name"
+		FROM book a
+		<include refid="bookJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="library != null and library.id != null and library.id != ''">
+				AND a.library_id = #{library.id}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="category != null and category != ''">
+				AND a.category LIKE 
+					<if test="dbName == 'oracle'">'%'||#{category}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{category}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{category},'%')</if>
+			</if>
+			<if test="author != null and author != ''">
+				AND a.author = #{author}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Book">
+		SELECT 
+			<include refid="bookColumns"/>
+		FROM book a
+		<include refid="bookJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO book(
+			id,
+			library_id,
+			photo,
+			name,
+			press_name,
+			press_time,
+			total,
+			num,
+			category,
+			author,
+			price,
+			storage_date,
+			collect,
+			borrow,
+			renewal,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{library.id},
+			#{photo},
+			#{name},
+			#{pressName},
+			#{pressTime},
+			#{total},
+			#{num},
+			#{category},
+			#{author},
+			#{price},
+			#{storageDate},
+			#{collect},
+			#{borrow},
+			#{renewal},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE book SET 	
+			library_id = #{library.id},
+			photo = #{photo},
+			name = #{name},
+			press_name = #{pressName},
+			press_time = #{pressTime},
+			total = #{total},
+			num = #{num},
+			category = #{category},
+			author = #{author},
+			price = #{price},
+			storage_date = #{storageDate},
+			collect = #{collect},
+			borrow = #{borrow},
+			renewal = #{renewal},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE book SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
